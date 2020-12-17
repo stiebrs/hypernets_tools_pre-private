@@ -27,9 +27,10 @@ swir = False
 cap_list = list()
 
 
-def hypstar_python(line, block_position, output_dir="DATA"):
+def hypstar_python(line, block_position, output_dir="DATA", download=True):
 
     global last_it_vnir, last_it_swir, swir
+    global cap_list
 
     _, _, _, mode, action, it_vnir, cap_count, total_time = line
 
@@ -58,13 +59,19 @@ def hypstar_python(line, block_position, output_dir="DATA"):
             it_vnir = last_it_vnir
             it_swir = last_it_swir
 
+        # TODO : Refactor with virtual + call
         output_name = block_position + create_spectra_name(line) + ".spe"
 
         # FIXME : replace by error code..
         try:
+
             it_vnir, it_swir =\
                 take_spectra(path.join(output_dir, output_name),
                              mode, action, it_vnir, it_swir, cap_count)
+            cap_list += \
+                take_spectra(path.join(output_dir, output_name),
+                             mode, action, it_vnir, it_swir, cap_count,
+                             return_cap_list=True)
 
             # Update global vars for IT saving
             if mode == 'vis' or mode == 'bot':
@@ -80,6 +87,7 @@ def hypstar_python(line, block_position, output_dir="DATA"):
             print(f"Error : {e}")
             output_name = "ERR_" + output_name
 
+    print(cap_list)
     return output_name
 
 
@@ -181,7 +189,8 @@ def run_sequence_file(sequence_file, driver=True): # FIXME : # noqa C901
             #     output_name = send_to_hypstar(line, block_position)
             # ---------------------------------------------------------
             output_name = hypstar_python(line, block_position, output_dir=path.
-                                         join(DATA_DIR, seq_name, "RADIOMETER"))  # noqa
+                                         join(DATA_DIR, seq_name, "RADIOMETER"), # noqa
+                                         download=False)
 
             now_str = datetime.utcnow().strftime("%Y%m%dT%H%M%S")
             mdfile.write(f"{output_name}={now_str}\n")

@@ -58,7 +58,7 @@ def take_picture(path_to_file=None, params=None, return_stream=False):
         return e
 
 
-def take_spectra(path_to_file, mode, action, it_vnir, it_swir, cap_count,
+def take_spectra(path_to_file, mode, action, it_vnir, it_swir, cap_count, # noqa
                  gui=False, return_cap_list=False):
 
     rad = {'vis': radiometer.VNIR, 'swi': radiometer.SWIR,
@@ -94,30 +94,32 @@ def take_spectra(path_to_file, mode, action, it_vnir, it_swir, cap_count,
         if return_cap_list is True:
             return cap_list
 
-        # Concatenation
-        spectra = b''
-        for n, spectrum in enumerate(cap_list):
-            spectrum_data = spectrum.getRawData()
-            spectra += spectrum_data
-            print(f"Spectrum #{n} added")
-            # Read ITs :
-            if it_vnir == 0 and spectrum.radiometer == radiometer.VNIR:
-                it_vnir, = unpack('<H', spectrum_data[11:13])
-                # print(f"AIT update : {spectrum.radiometer}->{it_vnir} ms")
-            elif it_swir == 0 and spectrum.radiometer == radiometer.SWIR:
-                it_swir, = unpack('<H', spectrum_data[11:13])
-                # print(f"AIT update : {spectrum.radiometer}->{it_swir} ms")
+        # print("What ?")
+        # # Concatenation
+        # spectra = b''
+        # for n, spectrum in enumerate(cap_list):
+        #     spectrum_data = spectrum.getRawData()
+        #     spectra += spectrum_data
+        #     print(f"Spectrum #{n} added")
+        #     # Read ITs :
+        #     if it_vnir == 0 and spectrum.radiometer == radiometer.VNIR:
+        #         it_vnir, = unpack('<H', spectrum_data[11:13])
+        #         # print(f"AIT update : {spectrum.radiometer}->{it_vnir} ms")
+        #     elif it_swir == 0 and spectrum.radiometer == radiometer.SWIR:
+        #         it_swir, = unpack('<H', spectrum_data[11:13])
+        #         # print(f"AIT update : {spectrum.radiometer}->{it_swir} ms")
 
-        # Save
-        with open(path_to_file, "wb") as f:
-            f.write(spectra)
+        # # Save
+        # with open(path_to_file, "wb") as f:
+        #     f.write(spectra)
 
-        print(f"Saved to {path_to_file}.")
+        # print(f"Saved to {path_to_file}.")
 
     except Exception as e:
         print(f"Error : {e}")
         return e
 
+    # TODO : use finally patern for return
     if gui:
         return it_vnir, it_swir, path_to_file
 
