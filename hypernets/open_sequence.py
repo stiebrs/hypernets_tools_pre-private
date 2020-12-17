@@ -24,6 +24,7 @@ from hypernets.scripts.call_radiometer import unset_tec
 last_it_vnir = 0
 last_it_swir = 0
 swir = False
+cap_list = list()
 
 
 def hypstar_python(line, block_position, output_dir="DATA"):
