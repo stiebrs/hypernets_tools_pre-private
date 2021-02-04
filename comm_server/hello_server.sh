@@ -34,12 +34,6 @@ ipServer=${ipServer%%*( )}
 remoteDir=${remoteDir%%*( )}
 shopt -u extglob
 
-# Make Logs
-mkdir -p LOGS
-journalctl -eu hypernets-sequence -n 1500 --no-pager > LOGS/hypernets-sequence.log
-journalctl -eu hypernets-hello -n 150 --no-pager > LOGS/hypernets-hello.log
-
-
 # Update the datetime flag on the server
 ssh -t $ipServer 'touch ~/system_is_up' > /dev/null 2>&1 
 
@@ -48,6 +42,15 @@ source comm_server/bidirectional_sync.sh
 
 bidirectional_sync "config_hypernets.ini" \
 	"$ipServer" "~/config_hypernets.ini.$USER"
+
+# update software if necessary
+# TODO : y/n option in config
+git pull
+
+# Make Logs
+mkdir -p LOGS
+journalctl -eu hypernets-sequence -n 3000 --no-pager > LOGS/hypernets-sequence.log
+journalctl -eu hypernets-hello -n 150 --no-pager > LOGS/hypernets-hello.log
 
 # Send data
 rsync -rt --exclude "CUR*" "DATA" "$ipServer:$remoteDir"
