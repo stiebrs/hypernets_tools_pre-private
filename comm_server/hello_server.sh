@@ -22,7 +22,7 @@ set -euo pipefail                           # Bash Strict Mode
 
 
 echo "Sleep 30 sec"
-sleep 30
+# sleep 30
 
 # Read config file :
 ipServer=$(awk -F "= " '/credentials/ {print $2}' config_hypernets.ini)
@@ -34,31 +34,39 @@ ipServer=${ipServer%%*( )}
 remoteDir=${remoteDir%%*( )}
 shopt -u extglob
 
+echo "Config credential : " $ipServer
+echo "Remote directory  : " $remoteDir
+
 # Update the datetime flag on the server
+echo "Touching flag on server side : ~/system_is_up"
 ssh -t $ipServer 'touch ~/system_is_up' > /dev/null 2>&1 
 
 # Sync Config Files
+echo "Syncing configs..."
 source comm_server/bidirectional_sync.sh
-
 bidirectional_sync "config_hypernets.ini" \
 	"$ipServer" "~/config_hypernets.ini.$USER"
 
 # update software if necessary
 # TODO : y/n option in config
+echo "Pulling update..."
 git pull
 
 # Make Logs
+echo "Making logs..."
 mkdir -p LOGS
 journalctl -eu hypernets-sequence -n 3000 --no-pager > LOGS/hypernets-sequence.log
 journalctl -eu hypernets-hello -n 150 --no-pager > LOGS/hypernets-hello.log
 
 # Send data
+echo "Syncing DATA..."
 rsync -rt --exclude "CUR*" "DATA" "$ipServer:$remoteDir"
+echo "Syncing LOGS..."
 rsync -rt "LOGS" "$ipServer:$remoteDir"
 
 # Sync the whole config folder from remote to local :
 # rsync -rt "$ipServer:~/config/" "/opt/pyxis/config/"
 
 # Set up the reverse ssh
-source comm_server/reverse_ssh.sh
-reverse_ssh $ipServer
+# source comm_server/reverse_ssh.sh
+# reverse_ssh $ipServer
