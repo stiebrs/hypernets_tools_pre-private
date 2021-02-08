@@ -16,7 +16,6 @@
 set -o nounset                              # Treat unset variables as an error
 set -euo pipefail                           # Bash Strict Mode
 
-
 startSequence=$(awk -F "[ =]+" '/start_sequence/ {print $2}' config_hypernets.ini)
 bypassYocto=$(awk -F "[ =]+" '/bypass_yocto/ {print $2}' config_hypernets.ini)
 hypstarPort=$(awk -F "[ =]+" '/hypstar_port/ {print $2}' config_hypernets.ini)
@@ -41,35 +40,41 @@ if [[ -n $loglevel ]] ; then
 	extra_args="$extra_args -l $loglevel"
 fi
 
-# Ensure Yocto is online
-if [[ "$bypassYocto" == "no" ]] ; then
-	yoctopuceIP=$(awk -F "[ =]+" '/yoctopuce_ip/ {print $2}' config_hypernets.ini)
-	echo "Waiting for yoctopuce..."
-	while ! timeout 2 ping -c 1 -n $yoctopuceIP &>/dev/null
-	do
-		echo .	
-	done
-	echo "Ok !"
+main() {
+	# Ensure Yocto is online
+	if [[ "$bypassYocto" == "no" ]] ; then
+		yoctopuceIP=$(awk -F "[ =]+" '/yoctopuce_ip/ {print $2}' config_hypernets.ini)
+		echo "Waiting for yoctopuce..."
+		while ! timeout 2 ping -c 1 -n $yoctopuceIP &>/dev/null
+		do
+			echo .	
+		done
+		echo "Ok !"
+	
+		python -m hypernets.scripts.relay_command -n2 -son
+		python -m hypernets.scripts.relay_command -n3 -son
+		python -m hypernets.scripts.relay_command -n6 -son
+	
+		echo "Waiting for instrument to boot"
+		#sleep 30  # Time for waking up
+	else
+		echo "Bypassing Yocto"
+	    extra_args="$extra_args --noyocto"
+	fi
+	
+	sequence_file=$(awk -F "[ =]+" '/sequence_file/ {print $2}' config_hypernets.ini)
+	
+	# sequence_file="hypernets/resources/sequences_samples/sequence_picture_sun.csv"
+	echo $sequence_file
 
-	python -m hypernets.scripts.relay_command -n2 -son
-	python -m hypernets.scripts.relay_command -n3 -son
-	python -m hypernets.scripts.relay_command -n6 -son
-
-else
-	echo "Bypassing Yocto"
-    extra_args="$extra_args --noyocto"
-fi
-
-sequence_file=$(awk -F "[ =]+" '/sequence_file/ {print $2}' config_hypernets.ini)
-
-# sequence_file="hypernets/resources/sequences_samples/sequence_picture_sun.csv"
-echo $sequence_file
+	python3 -m hypernets.open_sequence -df $sequence_file $extra_args
+}
 
 shutdown_sequence() {
     if [[ "$bypassYocto" == "no" ]] ; then
 	    python -m hypernets.scripts.relay_command -n2 -soff
 	    python -m hypernets.scripts.relay_command -n3 -soff
-	    python -m hypernets.scripts.relay_command -n6 -soff
+	    #python -m hypernets.scripts.relay_command -n6 -soff
     fi
 
     keepPc=$(awk -F "[ =]+" '/keep_pc/ {print $2}' config_hypernets.ini)
@@ -91,14 +96,25 @@ exit_actions() {
     if [ $return_value -eq 0 ] ; then
         echo "Success"
         shutdown_sequence;
+    elif [ $return_value -eq 27 ] ; then
+        echo "[ERROR] 12V Bus failure, retrying"
+
+    	if [[ "$bypassYocto" == "no" ]] ; then
+    	        python -m hypernets.scripts.relay_command -n2 -soff
+    	        python -m hypernets.scripts.relay_command -n3 -soff
+    	        #python -m hypernets.scripts.relay_command -n6 -soff
+    	fi
+
+	sleep 10
+	main
     else
     	echo "Hysptar scheduled job exited with code $return_value";
+	crontab -l > my_cron_backup.txt
+	crontab -r
+	#shutdown_sequence
     fi
 }
 
 trap "exit_actions" EXIT
-
-python3 -m hypernets.open_sequence -df $sequence_file $extra_args
-
-
+main
 
