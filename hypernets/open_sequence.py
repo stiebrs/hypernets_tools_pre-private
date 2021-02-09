@@ -110,11 +110,16 @@ def run_sequence_file(sequence_file, driver=True, DATA_DIR="DATA"): # FIXME : # 
             except Exception as e:
                 meteo_data.write(e)
 
-        instrument, visible, swir = get_serials()
-        print(f"SN : * instrument -> {instrument}")
-        print(f"     * visible    -> {visible}")
-        if swir != 0:
-            print(f"     * swir       -> {visible}")
+        try:
+            instrument, visible, swir = get_serials()
+            print(f"SN : * instrument -> {instrument}")
+            print(f"     * visible    -> {visible}")
+            if swir != 0:
+                print(f"     * swir       -> {visible}")
+
+        except Exception as e:
+            print(f"Error : {e}")
+
 
         mdfile = open(path.join(DATA_DIR, seq_name, "metadata.txt"), "w")
         sequence_reader = reader(sequence)
