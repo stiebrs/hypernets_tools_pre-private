@@ -117,7 +117,7 @@ def run_sequence_file(sequence_file, instrument_port, instrument_br, instrument_
                         instrument_instance = Hypstar(instrument_port)
                     except IOError as e:
                         print("[ERROR] Did not get instrument BOOTED packet in {}s".format(boot_timeout))
-                        sys.exit(27)
+                        sys.exit(6)
 
             # initialize instrument once
             try:
@@ -135,7 +135,7 @@ def run_sequence_file(sequence_file, instrument_port, instrument_br, instrument_
 
             except Exception as e:
                 print(e)
-                # if instrument does not respond, there's no point in doing anything, so we exit with ABORTED signal so that shell script can catch exception
+                # if instrument does not respond, there's no point in doing anything, so we exit with return code 6 so that shell script can catch exception
                 sys.exit(6)
 
         seq_name = create_seq_name(now=start, prefix="CUR")

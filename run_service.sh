@@ -91,30 +91,52 @@ shutdown_sequence() {
     fi
 }
 
+retry_sequence() {
+    if [[ "$bypassYocto" == "no" ]] ; then
+	    python -m hypernets.scripts.relay_command -n2 -soff
+	    python -m hypernets.scripts.relay_command -n3 -soff
+	    #python -m hypernets.scripts.relay_command -n6 -soff
+    fi
+
+    sleep 10
+    main
+}
+
 exit_actions() {
     return_value=$?
     if [ $return_value -eq 0 ] ; then
         echo "Success"
-        shutdown_sequence;
+        shutdown_sequence
     elif [ $return_value -eq 27 ] ; then
         echo "[ERROR] 12V Bus failure, retrying"
-
-    	if [[ "$bypassYocto" == "no" ]] ; then
-    	        python -m hypernets.scripts.relay_command -n2 -soff
-    	        python -m hypernets.scripts.relay_command -n3 -soff
-    	        #python -m hypernets.scripts.relay_command -n6 -soff
-    	fi
-
-	sleep 10
-	main
-    else
-    	echo "Hysptar scheduled job exited with code $return_value";
+	retry_sequence
+    elif [ $return_value -eq 6 ] ; then
+        echo "[ERROR] Radiometer did not respond, aborting and cancelling further cron jobs"
 	crontab -l > my_cron_backup.txt
 	crontab -r
-	#shutdown_sequence
+	exit -1
+    else
+    	echo "[ERROR] Hysptar scheduled job exited with code $return_value";
+	shutdown_sequence
     fi
 }
 
-trap "exit_actions" EXIT
+#trap "exit_actions" EXIT
 main
 
+return_value=$?
+if [ $return_value -eq 0 ] ; then
+    echo "Success"
+    shutdown_sequence
+elif [ $return_value -eq 27 ] ; then
+    echo "[ERROR] 12V Bus failure, retrying"
+    retry_sequence
+elif [ $return_value -eq 6 ] ; then
+    echo "[ERROR] Radiometer did not respond, aborting and cancelling further cron jobs"
+    crontab -l > my_cron_backup.txt
+    crontab -r
+    exit -1
+else
+    echo "[ERROR] Hysptar scheduled job exited with code $return_value";
+    shutdown_sequence
+fi
