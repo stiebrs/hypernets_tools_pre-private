@@ -9,7 +9,7 @@ then
 	pkill -P $prev_pid
 
 	## power cycle pan/tilt and radiometer
-	cd /home/joel/github/hypernets_tools_kaspars
+	cd /home/joel/github/hypernets_tools_joel
 	python -m hypernets.scripts.relay_command -n2 -soff
 	python -m hypernets.scripts.relay_command -n3 -soff
 
@@ -19,7 +19,7 @@ fi
 ## try up to 2 times
 #for i in {1..2}
 #do
-	cd /home/joel/github/hypernets_tools_kaspars
+	cd /home/joel/github/hypernets_tools_joel
 
 	## create log file name and link /home/joel/logtmp/run_service_latest.log to the new file
 	logfile=$(mktemp /home/joel/logtmp/run_service_XXXXX.log)
@@ -31,14 +31,14 @@ fi
 	sync
 
 	## run service
-	stdbuf -o0 -e0 /home/joel/github/hypernets_tools_kaspars/run_service.sh >> $logfile 2>&1 
+	stdbuf -o0 -e0 /home/joel/github/hypernets_tools_joel/run_service.sh >> $logfile 2>&1 
 	
 	sync
 
 	## move log file to data folder
 	## NB! This will probably fail if someone pokes the contents of /home/joel/github/hypernets_tools/DATA/
 	## while the stcript is running
-	dir=$(ls -1td /home/joel/github/hypernets_tools_kaspars/DATA/* | head -n 1)
+	dir=$(ls -1td /home/joel/github/hypernets_tools_joel/DATA/* | head -n 1)
 	mv -f $logfile $dir
 
 	sync
@@ -50,7 +50,7 @@ fi
 #	fi
 #	
 #	## switch off relays in case service crashed
-#	cd /home/joel/github/hypernets_tools_kaspars
+#	cd /home/joel/github/hypernets_tools_joel
 #	python -m hypernets.scripts.relay_command -n2 -soff
 #	python -m hypernets.scripts.relay_command -n3 -soff
 #	#python -m hypernets.scripts.relay_command -n6 -soff
