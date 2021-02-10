@@ -118,7 +118,7 @@ def run_sequence_file(sequence_file, instrument_port, instrument_br, instrument_
                         instrument_instance = Hypstar(instrument_port)
                     except IOError as e:
                         print("[ERROR] Did not get instrument BOOTED packet in {}s".format(boot_timeout))
-                        sys.exit(27)
+                        sys.exit(6)
 
             # initialize instrument once
             try:
@@ -132,12 +132,12 @@ def run_sequence_file(sequence_file, instrument_port, instrument_br, instrument_
                 # instrument power cycling is the only workaround and that's done in run_sequence bash script so we signal it that it's all bad
                 if not instrument_instance.hw_info.optical_multiplexer_available:
                     print("[ERROR] MUX+SWIR+TEC hardware not available")
-                    sys.exit(27)  # SIGABORT
+                    sys.exit(27)
 
             except Exception as e:
                 print(e)
-                # if instrument does not respond, there's no point in doing anything, so we exit with ABORTED signal so that shell script can catch exception
-                sys.exit(6)  # SIGABRT
+                # if instrument does not respond, there's no point in doing anything, so we exit with return code 6 so that shell script can catch exception
+                sys.exit(6)
 
         seq_name = create_seq_name(now=start, prefix="CUR")
         mkdir(path.join(DATA_DIR, seq_name))
@@ -171,12 +171,24 @@ def run_sequence_file(sequence_file, instrument_port, instrument_br, instrument_
         print(get_csv_header(), flush=True)
         mdfile = open(path.join(DATA_DIR, seq_name, "metadata.txt"), "w")
 
+        mdfile.write("[Metadata]\n")
+        mdfile.write("PyxisVersion=PYXIS_V000.50\n")
+        tmp = create_seq_name(now=start, prefix="")
+        mdfile.write(f"Datetime={tmp}\n")
+        mdfile.write("PI=JK\n")
+        mdfile.write("Site_name=T6ravere\n")
+        mdfile.write("Lat=58.265696\n")
+        mdfile.write("Lon=26.465870\n")
+
         if not park:
             # Enabling SWIR TEC for the whole sequence is a tradeoff between current consumption and execution time
             # Although it would seem that disabling TEC while rotating saves power,
             # one has to remember, that during initial thermal regulation TEC consumes 5x more current + does it for longer.
             if swir:
                 set_tec(instrument_instance)
+
+        # unwind file for processing
+        sequence.seek(0)
 
         sequence_reader = reader(sequence)
 
