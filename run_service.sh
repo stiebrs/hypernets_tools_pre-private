@@ -34,7 +34,9 @@ done
 echo "Ok !"
 
 python -m hypernets.scripts.relay_command -n2 -son
+sleep 1
 python -m hypernets.scripts.relay_command -n3 -son
+sleep 1
 python -m hypernets.scripts.relay_command -n6 -son
 
 echo "Waiting for instrument to boot"
@@ -48,7 +50,9 @@ echo $sequence_file
 python -m hypernets.open_sequence -df $sequence_file
 
 python -m hypernets.scripts.relay_command -n2 -soff
+sleep 1
 python -m hypernets.scripts.relay_command -n3 -soff
+sleep 1
 python -m hypernets.scripts.relay_command -n6 -soff
 
 keepPc=$(awk -F "[ =]+" '/keep_pc/ {print $2}' config_hypernets.ini)
