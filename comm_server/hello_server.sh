@@ -25,8 +25,8 @@ echo "Sleep 30 sec"
 sleep 30
 
 # Read config file :
-ipServer=$(awk -F "= " '/credentials/ {print $2}' config_hypernets.ini)
-remoteDir=$(awk -F "= " '/remote_dir/ {print $2}' config_hypernets.ini)
+ipServer=$(awk -F "= " '/credentials/ {print $2; exit}' config_hypernets.ini)
+remoteDir=$(awk -F "= " '/remote_dir/ {print $2; exit}' config_hypernets.ini)
 
 # Trim strings : 
 shopt -s extglob
@@ -63,6 +63,8 @@ echo "Syncing DATA..."
 rsync -rt --exclude "CUR*" "DATA" "$ipServer:$remoteDir"
 echo "Syncing LOGS..."
 rsync -rt "LOGS" "$ipServer:$remoteDir"
+echo "Syncing WEBCAM..."
+rsync -rt "WEBCAM" "$ipServer:$remoteDir"
 
 # Sync the whole config folder from remote to local :
 # rsync -rt "$ipServer:~/config/" "/opt/pyxis/config/"

@@ -12,8 +12,8 @@ baudrate = 3000000
 # supported levels are: ERROR (only errors are reported on stderr); INFO (stdout + stderr); DEBUG (driver command execution printout to stdout); TRACE (low level communication bytes are printed to stdout)
 loglevel = ERROR
 
-webcam_sky = credentials@ip_cam_sky
-webcam_site = credentials@ip_cam_site
+webcam_sky = credentials@ip_cam_sky    # relay 6
+webcam_site = credentials@ip_cam_site  # relay 5
 
 
 [yoctopuce]
@@ -41,10 +41,11 @@ remote_dir = ~/DATA
 # Tilt offset should be positif and < 70
 offset_pan = 0
 offset_tilt = +60
+
 [metadata]
-principal_investigator = Investigator Name
+principal_investigator = LOV
 datetime = {datetime}
-site_name = A Site Name
+site_name = Etang de Berre
 latitude = ${GPS:latitude}
 longitude = ${GPS:longitude}
 protocol_file_name = ${general:sequence_file}

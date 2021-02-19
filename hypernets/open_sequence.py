@@ -12,6 +12,7 @@ from os import mkdir, replace, path
 from hypernets.virtual.read_protocol import create_seq_name
 from hypernets.virtual.read_protocol import create_spectra_name
 from hypernets.virtual.read_protocol import create_block_position_name
+from hypernets.virtual.create_metadata import parse_config_metadata
 
 from hypernets.scripts.yocto_meteo import get_meteo
 from hypernets.scripts.pan_tilt import move_to
@@ -120,8 +121,11 @@ def run_sequence_file(sequence_file, driver=True, DATA_DIR="DATA"): # FIXME : # 
         except Exception as e:
             print(f"Error : {e}")
 
-
         mdfile = open(path.join(DATA_DIR, seq_name, "metadata.txt"), "w")
+
+        # Write metadata header
+        mdfile.write(parse_config_metadata())
+
         sequence_reader = reader(sequence)
 
         next(sequence_reader)  # skip header
