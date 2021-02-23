@@ -1,5 +1,6 @@
 __pycache__/
 DATA/
 LOGS/
+WEBCAM/
 config_hypernets.ini
 .ipynb_checkpoints/

@@ -24,11 +24,13 @@ IFS=$'\n\t'
 webcam_site(){
 	echo "Sleeping 60s"
 	sleep 60 # empirical
-	config_sky=$(awk -F "[ =]+" '/webcam_site/ {print $2; exit}' config_hypernets.ini)
-	credent_sky=$(echo $config_sky | cut -d "@" -f1)
-	ip_sky=$(echo $config_sky | cut -d "@" -f2)
-	./webcamGetImg.sh -c "$credent_sky" -i "$ip_sky" -d "WEBCAM/" -wv
-	exit 0
+	config_site=$(awk -F "[ =]+" '/webcam_site/ {print $2; exit}' config_hypernets.ini)
+	credent_site=$(echo $config_site | cut -d "@" -f1)
+	ip_site=$(echo $config_site | cut -d "@" -f2)
+	./webcamGetImg.sh -c "$credent_site" -i "$ip_site" -d "WEBCAM/" -wv
+	echo $PWD
+	python -m hypernets.scripts.relay_command -n5 -soff
+	echo "Closing relay 5"
 }
 
 webcam_sky(){
@@ -37,9 +39,10 @@ webcam_sky(){
 	config_sky=$(awk -F "[ =]+" '/webcam_sky/ {print $2; exit}' config_hypernets.ini)
 	credent_sky=$(echo $config_sky | cut -d "@" -f1)
 	ip_sky=$(echo $config_sky | cut -d "@" -f2)
+	echo $PWD
 	./webcamGetImg.sh -c "$credent_sky" -i "$ip_sky" -d "WEBCAM/" -wv
 	python -m hypernets.scripts.relay_command -n6 -soff
-	exit 0
+	echo "Closing relay 6"
 }
 
 echo "Opening relay 5"
@@ -54,9 +57,5 @@ webcam_site &
 pid_site=$!
 
 wait $pid_sky
-echo "Closing relay 5"
-python -m hypernets.scripts.relay_command -n5 -soff
 sleep 1
 wait $pid_site
-echo "Closing relay 6"
-python -m hypernets.scripts.relay_command -n6 -soff

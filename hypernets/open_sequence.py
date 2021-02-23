@@ -84,6 +84,7 @@ def hypstar_python(line, block_position, output_dir="DATA"):
 
 
 def run_sequence_file(sequence_file, driver=True, DATA_DIR="DATA"): # FIXME : # noqa C901
+    global swir
     with open(sequence_file, mode='r') as sequence:
 
         if not path.exists(DATA_DIR):

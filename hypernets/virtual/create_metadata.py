@@ -10,7 +10,7 @@ from configparser import MissingSectionHeaderError
 def special_value(value):
     if value == "{datetime}":
         return datetime.utcnow().strftime("%Y%m%dT%H%M%S")
-    elif value == "{v_hypernets_tools}":
+    elif value == "{hypernets_tools_v}":
         return __version__
     else:
         return "N/A"
