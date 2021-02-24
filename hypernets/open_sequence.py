@@ -165,7 +165,7 @@ def run_sequence_file(sequence_file, driver=True, DATA_DIR="DATA"): # FIXME : # 
                     tilt = 180 - zenith_sun
 
                 else:
-                    if azimuth_sun <= 180:
+                    if True:
                         print(" -- Morning : +90 (=clockwise)")
                         pan = azimuth_sun + pan  # clockwise
                     else:
