@@ -192,7 +192,7 @@ def run_sequence_file(sequence_file, instrument_port, instrument_br, instrument_
 
         print(get_csv_header(), flush=True)
         mdfile = open(path.join(DATA_DIR, seq_name, "metadata.txt"), "w")
-	mdfile.write(parse_config_metadata())
+        mdfile.write(parse_config_metadata())
 
         if not park:
             # Enabling SWIR TEC for the whole sequence is a tradeoff between current consumption and execution time
