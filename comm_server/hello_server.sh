@@ -42,6 +42,7 @@ shopt -u extglob
 
 # Make Logs
 mkdir -p LOGS
+
 journalctl -eu hypernets-sequence -n 15000 --no-pager > LOGS/hypernets-sequence.log
 journalctl -eu hypernets-hello -n 15000 --no-pager > LOGS/hypernets-hello.log
 
