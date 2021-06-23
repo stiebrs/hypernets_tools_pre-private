@@ -56,13 +56,14 @@ source comm_server/bidirectional_sync.sh
 bidirectional_sync "config_hypernets.ini" \
 	"$ipServer" "$remoteDir/config_hypernets.ini.$USER" "$sshPort"
 
-git pull
 
 # Send data
 echo "Syncing Data..."
 rsync -e "ssh -p $sshPort" -rt --exclude "CUR*" "DATA" "$ipServer:$remoteDir"
 echo "Syncing Logs..."
 rsync -e "ssh -p $sshPort" -rt "LOGS" "$ipServer:$remoteDir"
+
+git pull
 
 # Set up the reverse ssh
 source comm_server/reverse_ssh.sh
