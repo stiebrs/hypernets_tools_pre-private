@@ -23,7 +23,7 @@ IFS=$'\n\t'
 
 webcam_site(){
 	echo "Sleeping 60s"
-	# sleep 60 # empirical
+	sleep 60 # empirical
 	config_site=$(awk -F "[ =]+" '/webcam_site/ {print $2; exit}' config_hypernets.ini)
 	credent_site=$(echo $config_site | cut -d "@" -f1)
 	ip_site=$(echo $config_site | cut -d "@" -f2)
@@ -35,7 +35,7 @@ webcam_site(){
 
 webcam_sky(){
 	echo "Sleeping 75s"
-	# sleep 75 # empirical
+	sleep 75 # empirical
 	config_sky=$(awk -F "[ =]+" '/webcam_sky/ {print $2; exit}' config_hypernets.ini)
 	credent_sky=$(echo $config_sky | cut -d "@" -f1)
 	ip_sky=$(echo $config_sky | cut -d "@" -f2)
@@ -45,11 +45,8 @@ webcam_sky(){
 	echo "Closing relay 6"
 }
 
-echo "Opening relay 5"
-python -m hypernets.scripts.relay_command -n5 -son
-sleep 1
-echo "Opening relay 6"
-python -m hypernets.scripts.relay_command -n6 -son
+echo "Opening relay 5 & 6"
+python -m hypernets.scripts.relay_command -n5 -n6 -son
 
 webcam_sky &
 pid_sky=$!
