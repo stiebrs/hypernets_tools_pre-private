@@ -5,3 +5,4 @@ config_hypernets.ini
 config_dynamic.ini
 config_static.ini
 .ipynb_checkpoints/
+config.dump
