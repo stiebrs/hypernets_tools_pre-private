@@ -48,6 +48,7 @@ offset_tilt = +60
 
 [metadata]
 principal_investigator = Investigator Name
+sn_hypstar = 123456
 datetime = {datetime}
 site_id = A Site ID
 latitude = ${GPS:latitude}
