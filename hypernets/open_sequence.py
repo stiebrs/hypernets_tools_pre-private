@@ -165,12 +165,12 @@ def run_sequence_file(sequence_file, driver=True, DATA_DIR="DATA"): # FIXME : # 
                     tilt = 180 - zenith_sun
 
                 else:
-                    if True:
+                    if azimuth_sun <= 200:
                         print(" -- Morning : +90 (=clockwise)")
                         pan = azimuth_sun + pan  # clockwise
                     else:
                         print(" -- Afternoon : -90 (=counter-clockwise)")
-                        pan = azimuth_sun - pan  # clockwise
+                        pan = azimuth_sun - pan  # counter-clockwise
 
                 print(f"--> Converted Position (pan : {pan:.2f} / {ref} ; "
                       f"tilt :{tilt:.2f})")
